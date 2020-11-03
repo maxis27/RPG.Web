@@ -1,0 +1,79 @@
+@model ArenaReportViewModel
+@inject IInventoryRepository inventoryRepository
+@inject IItemRepository itemRepository
+
+@{
+    Layout = "";
+
+    ItemWeapon weapon = null;
+    foreach(var used in inventoryRepository.GetInventory(Model.User.Id).Where(x => x.Used == true).ToList())
+    {
+        var item = itemRepository.GetItem(used.ItemId);
+        if(item.Type == ItemType.Weapon)
+        {
+            weapon = (ItemWeapon)item.ItemType;
+            break;
+        }
+    }
+
+    object damage = Model.User.GetDamage();
+    if(weapon != null)
+    {
+        var avgDamage = (((int)damage + weapon.MinDamage) + ((int)damage + weapon.MaxDamage)) / 2;
+        damage = $"{(int)damage + weapon.MinDamage} / {(int)damage + weapon.MaxDamage} ({avgDamage})";
+    }
+}
+
+<div class="row">
+    <div class="card col-sm-6">
+        <div class="card-body">
+            <legend>@(Model.Type == ReportType.Attack ? "Atakujący" : "Broniący się")</legend>
+            <table class="table table-striped table-hover">
+                <tr>
+                    <td>Nazwa:</td>
+                    <td><div class="float-right">@Model.User.UserName</div></td>
+                </tr>
+                <tr>
+                    <td>Punkty zdrowia:</td>
+                    <td><div class="float-right">@Model.HealthPoints / @Model.User.MaxHealthPoints</div></td>
+                </tr>
+                <tr>
+                    <td>Obrażenia:</td>
+                    <td><div class="float-right">@damage</div></td>
+                </tr>
+                <tr>
+                    <td>Unik:</td>
+                    <td><div class="float-right">@Model.User.GetDodge()%</div></td>
+                </tr>
+                <tr>
+                    <td>Cios krytyczny:</td>
+                    <td><div class="float-right">@Model.User.GetCritical()%</div></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div class="card col-sm-6">
+        <div class="card-body">
+            <legend>Raport z walki</legend>
+            <table class="table table-striped table-hover">
+                <tr>
+                    <td>Liczba rund:</td>
+                    <td><div class="float-right">@Model.Rounds</div></td>
+                </tr>
+                <tr>
+                    <td>Wynik:</td>
+                    <td>
+                        <div class="float-right">
+                            @(Model.UserScore > Model.EnemyScore ? Model.UserScore : Model.EnemyScore) do 
+                            @(Model.UserScore < Model.EnemyScore ? Model.UserScore : Model.EnemyScore)
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Zdobyte PD:</td>
+                    <td><div class="float-right">@Model.ExperiencePoints</div></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>

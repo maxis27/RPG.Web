@@ -1,0 +1,59 @@
+@model WorkViewModel
+@inject ILocationRepository locationRepository
+@inject UserManager<ApplicationUser> userManager
+
+@{
+    ViewBag.Title = "Praca";
+}
+
+<div class="card">
+    <div class="card-header">@ViewBag.Title</div>
+    <div class="card-body">
+        @if(Model.WorkProgress)
+        {
+            var progress = Math.Floor((DateTime.UtcNow - Model.Work.Start) / (Model.Work.End - Model.Work.Start) * 100);
+            var remains = Math.Floor((Model.Work.End - DateTime.UtcNow).TotalSeconds);
+            var now = DateTime.UtcNow.Ticks / @TimeSpan.TicksPerSecond;
+            var start = Model.Work.Start.Ticks / TimeSpan.TicksPerSecond;
+            var end = Model.Work.End.Ticks / TimeSpan.TicksPerSecond;
+
+            <form asp-controller="Game" asp-action="StopWork" method="post">
+               <div class="progress mb-3" style="height: 30px;">
+                    <div id="progressbar" class="progress-bar progress-bar-striped progress-bar-animated bg-info" role="progressbar" style="width: @progress%;">
+                        <span id="clock">@remains.ToString(@"hh\:mm\:ss")</span>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Zakończ pracę</button>
+            </form>
+
+            @section Scripts
+            {
+                <script>
+                    countTime(@remains, "/Game/Work");
+                    progress(@now, @start, @end);
+                </script>
+            }
+        }
+        else
+        {
+            var user = await userManager.GetUserAsync(User);
+            var location = locationRepository.GetLocations()
+                                            .Where(loc => loc.X == user.PositionX)
+                                            .Where(loc => loc.Y == user.PositionY)
+                                            .SingleOrDefault();
+
+            <form method="post">
+                <div asp-validation-summary="All" class="text-danger"></div>
+                <div class="form-group">
+                    <label>1 godzina</label>
+                    <input placeholder="@location.Gold złota / @location.Experience pkt. doświadczenia" class="form-control" disabled/>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Work.Hours"></label>
+                    @Html.DropDownListFor(m => m.Work.Hours, Enumerable.Range(1, 10).Select(i => new SelectListItem { Text = i.ToString() + " godz.", Value = i.ToString() }), new { @class = "form-control" })
+                </div>
+                <button type="submit" class="btn btn-primary">Pracuj</button>
+            </form>
+        }
+    </div>
+</div>

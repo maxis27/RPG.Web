@@ -1,0 +1,46 @@
+@model Changes
+
+@{
+    ViewBag.Title = "Lista zmian";
+}
+
+<div class="card">
+    <div class="card-header">@ViewBag.Title</div>
+    <div class="card-body">
+        <form asp-action="Edit" method="post" class="mt-3">
+            <div class="form-group row">
+                <label asp-for="Version" class="col-sm-2 col-form-label"></label>
+                <div class="col-sm-10">
+                    <input asp-for="Version" class="form-control" placeholder="Wersja">
+                    <span asp-validation-for="Version" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label asp-for="Content" class="col-sm-2 col-form-label"></label>
+                <div class="col-sm-10">
+                    <textarea asp-for="Content" class="form-control" placeholder="Treść" rows="10"></textarea>
+                    <span asp-validation-for="Content" class="text-danger"></span>
+                </div>
+            </div>
+            <div asp-validation-summary="All" class="text-danger"></div>
+            <div class="form-group row">
+                <div class="col-sm-10">
+                    <button type="submit" class="btn btn-primary">Aktualizuj</button>
+                    <a asp-action="Index" class="btn btn-info">Anuluj</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script src="~/lib/tinymce/tinymce.min.js"></script>
+    <script>
+        tinymce.init({ 
+            selector: "textarea",
+            plugins: "lists",
+            toolbar: "undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent"
+        });
+    </script>
+}

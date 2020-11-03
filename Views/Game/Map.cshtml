@@ -1,0 +1,107 @@
+@model MapViewModel
+@inject UserManager<ApplicationUser> userManager
+
+@{
+    ViewBag.Title = "Mapa";
+    var user = await userManager.GetUserAsync(User);
+    var rand = new Random();
+}
+
+<div class="card">
+    <div class="card-header">@ViewBag.Title</div>
+    <div class="card-body">
+        <form method="GET">
+            <div class="form-group">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                       <span class="input-group-text">x</span>
+                    </div>
+                    <input asp-for="X" class="form-control"/>
+                    <div class="input-group-prepend input-group-append">
+                        <span class="input-group-text">y</span>
+                    </div>
+                    <input asp-for="Y" class="form-control"/>
+                    <div class="input-group-append">
+                        <input type="submit" class="btn btn-outline-secondary" value="Idź"/>
+                    </div>
+                </div>
+            </div>
+        </form>
+        @if(Model.X >= 1 && Model.X <= 8 && Model.Y >=1 && Model.Y <= 8)
+        {
+            <div class="row justify-content-center text-center">
+                <div class="col-auto">
+                    <div class="table-responsive text-nowrap">
+                        <table style="table">
+                            <tr>
+                                <td></td>
+                                <td><a asp-action="Map" asp-route-x="@Model.X" asp-route-y="@(Model.Y-1)"><ion-icon name="arrow-up-outline"></ion-icon></a></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td><a asp-action="Map" asp-route-x="@(Model.X-1)" asp-route-y="@Model.Y"><ion-icon name="arrow-back-outline"></ion-icon></a></td>
+                                <td style="font-size: 0px;">
+                                @if(Model.X >= 1 && Model.Y >= 1)
+                                {
+                                    for(int m = Model.Y - 3; m <= Model.Y + 3; m++)
+                                    {
+                                        for(int n = Model.X - 3; n <= Model.X + 3; n++)
+                                        {
+                                            var isLocation = false;
+                                            var _location = new Location();
+                                            foreach(var location in Model.Locations)
+                                            {
+                                                if(n == location.X && m == location.Y)
+                                                {
+                                                    isLocation = true;
+                                                    _location = location;
+                                                    break;
+                                                }
+                                            }
+
+                                            if(isLocation)
+                                            {
+                                                if(n == user.PositionX && m == user.PositionY)
+                                                {
+                                                    <a asp-action="Area"><img src="~/images/map/3.png" title="@_location.Name" /></a>
+                                                }
+                                                else
+                                                {
+                                                    <a asp-action="Location" asp-route-id="@_location.Id"><img src="~/images/map/1.png" title="@_location.Name" /></a>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                if(m < 1 || m > 8 || n < 1 || n > 8)
+                                                {
+                                                    <img src="~/images/map/0.png" />
+                                                }
+                                                else
+                                                {
+                                                    
+                                                    <img src="~/images/map/2_@(rand.Next(1,3)).png" />
+                                                }
+                                            }
+                                        }
+                                        <br/>
+                                    }
+                                }
+                                </td>
+                                <td><a asp-action="Map" asp-route-x="@(Model.X+1)" asp-route-y="@Model.Y"><ion-icon name="arrow-forward-outline"></ion-icon></a></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td><a asp-action="Map" asp-route-x="@Model.X" asp-route-y="@(Model.Y+1)"><ion-icon name="arrow-down-outline"></ion-icon></a></td>
+                                <td></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <h5 class="card-title">Wykroczyłeś poza zakres.</h5>
+        }
+    </div>
+</div>

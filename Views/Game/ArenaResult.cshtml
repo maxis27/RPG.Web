@@ -1,0 +1,147 @@
+@model ArenaResultViewModel
+@inject IInventoryRepository inventoryRepository
+@inject IItemRepository itemRepository
+
+@{
+    ViewBag.Title = "Arena";
+
+    ItemWeapon userWeapon = null;
+    foreach(var used in inventoryRepository.GetInventory(Model.User.Id).Where(x => x.Used == true).ToList())
+    {
+        var item = itemRepository.GetItem(used.ItemId);
+        if(item.Type == ItemType.Weapon)
+        {
+            userWeapon = (ItemWeapon)item.ItemType;
+            break;
+        }
+    }
+
+    object userDamage = Model.User.GetDamage();
+    if(userWeapon != null)
+    {
+        var avgDamage = (((int)userDamage + userWeapon.MinDamage) + ((int)userDamage + userWeapon.MaxDamage)) / 2;
+        userDamage = $"{(int)userDamage + userWeapon.MinDamage} / {(int)userDamage + userWeapon.MaxDamage} ({avgDamage})";
+    }
+
+    ItemWeapon enemyWeapon = null;
+    foreach(var used in inventoryRepository.GetInventory(Model.Enemy.Id).Where(x => x.Used == true).ToList())
+    {
+        var item = itemRepository.GetItem(used.ItemId);
+        if(item.Type == ItemType.Weapon)
+        {
+            enemyWeapon = (ItemWeapon)item.ItemType;
+            break;
+        }
+    }
+
+    object enemyDamage = Model.Enemy.GetDamage();
+    if(enemyWeapon != null)
+    {
+        var avgDamage = (((int)enemyDamage + enemyWeapon.MinDamage) + ((int)enemyDamage + enemyWeapon.MaxDamage)) / 2;
+        enemyDamage = $"{(int)enemyDamage + enemyWeapon.MinDamage} / {(int)enemyDamage + enemyWeapon.MaxDamage} ({avgDamage})";
+    }
+}
+
+<div class="card">
+    <div class="card-header">@ViewBag.Title</div>
+    <div class="card-body">
+        <div class="row mb-3">
+            <div class="col-sm-6">
+                <div class="card col mb-2">
+                @if(Model.User.Avatar != string.Empty)
+                {
+                    <img class="card-img-top p-2" src="~/images/avatars/@Model.User.Avatar">
+                } 
+                else 
+                {
+                    <img class="card-img-top p-2" src="~/images/no-avatar.png">
+                }
+                </div>
+                <div class="card col">
+                    <div class="card-body">
+                        <legend>Atakujący</legend>
+                        <table class="table table-striped table-hover">
+                            <tr>
+                                <td>Nazwa: @Model.User.UserName</td>
+                                <td><div class="float-right"></div></td>
+                            </tr>
+                            <tr>
+                                <td>Obrażenia: @userDamage</td>
+                                <td><div class="float-right"></div></td>
+                            </tr>
+                            <tr>
+                                <td>Unik: @Model.User.GetDodge()%</td>
+                                <td><div class="float-right"></div></td>
+                            </tr>
+                            <tr>
+                                <td>Cios krytyczny: @Model.User.GetCritical()%</td>
+                                <td><div class="float-right"></div></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="card col mb-2">
+                @if(Model.Enemy.Avatar != string.Empty)
+                {
+                    <img class="card-img-top p-2" src="~/images/avatars/@Model.Enemy.Avatar">
+                } 
+                else 
+                {
+                    <img class="card-img-top p-2" src="~/images/no-avatar.png">
+                }
+                </div>
+                <div class="card col">
+                    <div class="card-body">
+                        <legend>Broniący się</legend>
+                        <table class="table table-striped table-hover">
+                            <tr>
+                                <td>Nazwa: @Model.Enemy.UserName</td>
+                                <td><div class="float-right"></div></td>
+                            </tr>
+                            <tr>
+                                <td>Obrażenia: @enemyDamage</td>
+                                <td><div class="float-right"></div></td>
+                            </tr>
+                            <tr>
+                                <td>Unik: @Model.Enemy.GetDodge()%</td>
+                                <td><div class="float-right"></div></td>
+                            </tr>
+                            <tr>
+                                <td>Cios krytyczny: @Model.Enemy.GetCritical()%</td>
+                                <td><div class="float-right"></div></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @Html.Raw(Model.FightInfo)
+
+        <div class="row">
+            <div class="card col-sm col-md col-lg m-1">
+                <div class="card-body">
+                    <legend>@(Model.UserScore > Model.EnemyScore ? "WYGRANA" : "PRZEGRANA")</legend>
+                    <table class="table table-striped table-hover">
+                        <tr>
+                            <td>Wynik:</td>
+                            <td><div class="float-right">
+                                @(Model.UserScore > Model.EnemyScore ? Model.UserScore : Model.EnemyScore) do 
+                                @(Model.UserScore < Model.EnemyScore ? Model.UserScore : Model.EnemyScore)
+                            </div></td>
+                        </tr>
+                        <tr>
+                            <td>Zdobyte PD:</td>
+                            <td><div class="float-right">@Model.ExperiencePoints</div></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div class="card col-sm-5 col-md-4 col-lg-5 m-1">
+                <img class="card-img-top p-2" src="~/images/no-avatar.png">
+            </div>
+        </div>
+    </div>
+</div>

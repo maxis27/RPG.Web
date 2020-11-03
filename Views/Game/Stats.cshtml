@@ -1,0 +1,74 @@
+@model ApplicationUser
+@inject UserManager<ApplicationUser> userManager
+@inject IInventoryRepository inventoryRepository
+@inject IItemRepository itemRepository
+
+@{
+    ViewBag.Title = "Statystyki gracza";
+    var user = await userManager.GetUserAsync(User);
+
+    ItemWeapon weapon = null;
+    foreach(var used in inventoryRepository.GetInventory(Model.Id).Where(x => x.Used == true).ToList())
+    {
+        var item = itemRepository.GetItem(used.ItemId);
+        if(item.Type == ItemType.Weapon)
+        {
+            weapon = (ItemWeapon)item.ItemType;
+            break;
+        }
+    }
+
+    object damage = Model.GetDamage();
+    if(weapon != null)
+    {
+        var avgDamage = (((int)damage + weapon.MinDamage) + ((int)damage + weapon.MaxDamage)) / 2;
+        damage = $"{(int)damage + weapon.MinDamage} / {(int)damage + weapon.MaxDamage} ({avgDamage})";
+    }
+}
+
+<div class="card">
+    <div class="card-header">@ViewBag.Title</div>
+    <div class="card-body">
+        <div class="row">
+            <div class="card col-sm-5 col-md-4 col-lg-5 m-1">
+                @if(Model.Avatar != string.Empty)
+                {
+                    <img class="card-img-top p-2" src="~/images/avatars/@Model.Avatar">
+                } 
+                else 
+                {
+                    <img class="card-img-top p-2" src="~/images/no-avatar.png">
+                }
+            </div>
+            <div class="card col-sm col-md col-lg m-1">
+                <div class="card-body">
+                    <legend>Informacje o użytkowniku</legend>
+                    <table class="table table-striped table-hover">
+                        <tr>
+                            <td>Nazwa:</td>
+                            <td><div class="float-right">@Model.UserName</div></td>
+                        </tr>
+                        <tr>
+                            <td>Obrażenia:</td>
+                            <td><div class="float-right">@damage</div></td>
+                        </tr>
+                        <tr>
+                            <td>Unik:</td>
+                            <td><div class="float-right">@Model.GetDodge()%</div></td>
+                        </tr>
+                        <tr>
+                            <td>Cios krytyczny:</td>
+                            <td><div class="float-right">@Model.GetCritical()%</div></td>
+                        </tr>
+                    </table>
+                </div>
+                @if(user.Id != Model.Id)
+                {
+                    <div class="card-footer">
+                        <a asp-action="Arena" asp-route-id="@Model.Id" class="btn btn-primary">Walcz</a>
+                    </div>
+                }    
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,31 @@
+@model MedicViewModel
+
+@{
+    ViewBag.Title = "Medyk";
+}
+
+<div class="card">
+    <div class="card-header">@ViewBag.Title</div>
+    <div class="card-body">
+        @if(Model.FullHealth)
+        {
+            <h5 class="card-title">Twoja postać nie wymaga leczenia.</h5>
+        }
+        else 
+        {
+            <form method="post">
+                <div asp-validation-summary="All" class="text-danger"></div>
+                <div class="form-group">
+                    <label>Koszt</label>
+                    <input placeholder="1 pkt. zdrowia - 10 złota" class="form-control" disabled/>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Points"></label>
+                    <input asp-for="Points" class="form-control" placeholder="Wpisz ilość punktów"/>
+                    <span asp-validation-for="Points" class="text-danger"></span>
+                </div>
+                <button type="submit" class="btn btn-primary">Wylecz</button>
+            </form>
+        }
+    </div>
+</div>

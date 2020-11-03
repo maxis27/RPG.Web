@@ -1,0 +1,86 @@
+﻿@model SidebarViewModel
+
+<div class="card">
+    <div class="card-header">
+        Witaj: @User.Identity.Name
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md col-lg-12 mb-3">
+                <div class="card">
+                    <div class="card-header">
+                        Poziom: @Model.Level
+                    </div>
+                    <div class="card-body">
+                        <div class="progress mb-3" style="height: 30px;">
+                            <div class="progress-bar bg-danger" role="progressbar" style="width: @Model.HealthPointsProgress%;">
+                                <span>Punkty zdrowia: @Model.HealthPoints / @Model.MaxHealthPoints</span>
+                            </div>
+                        </div>
+                        <div class="progress mb-3" style="height: 30px;">
+                            <div class="progress-bar bg-warning" role="progressbar" style="width: @Model.ActionPointsProgress%;">
+                                <span>Punkty akcji: @Model.ActionPoints / @Model.MaxActionPoints</span>
+                            </div>
+                        </div>
+                        <div class="progress mb-3" style="height: 30px;">
+                            <div class="progress-bar bg-success" role="progressbar" style="width: @Model.ExperiencePointsProgress%;">
+                                <span>Punkty doświadczenia: @Model.ExperiencePoints / @Model.MaxExperiencePoints</span>
+                            </div>
+                        </div>
+                        <div class="input-group mb-3">
+                            <input type="text" class="form-control" placeholder="@Model.Gold" disabled>
+                            <div class="input-group-append">
+                                <span class="input-group-text">Złoto</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md col-lg">
+                <div class="card">
+                    <div class="card-header">
+                        Punkty umiejętności: @Model.SkillPoints
+                    </div>
+                    <div class="card-body">
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend" style="width: 50%">
+                                <span class="input-group-text" style="width: 100%">Siła</span>
+                            </div>
+                            <input type="text" class="form-control" placeholder="@Model.Strength" disabled>
+                            <div class="input-group-append">
+                                <a asp-controller="Game" asp-action="UpgradeSkills" asp-route-id="Strength" class="btn btn-outline-secondary"><ion-icon name="add-circle-outline"></ion-icon></a>
+                            </div>
+                        </div>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend" style="width: 50%">
+                                <span class="input-group-text" style="width: 100%">Zręczność</span>
+                            </div>
+                            <input type="text" class="form-control" placeholder="@Model.Dexterity" disabled>
+                            <div class="input-group-append">
+                                <a asp-controller="Game" asp-action="UpgradeSkills" asp-route-id="Dexterity" class="btn btn-outline-secondary"><ion-icon name="add-circle-outline"></ion-icon></a>
+                            </div>
+                        </div>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend" style="width: 50%">
+                                <span class="input-group-text" style="width: 100%">Wytrzymałość</span>
+                            </div>
+                            <input type="text" class="form-control" placeholder="@Model.Stamina" disabled>
+                            <div class="input-group-append">
+                                <a asp-controller="Game" asp-action="UpgradeSkills" asp-route-id="Stamina" class="btn btn-outline-secondary"><ion-icon name="add-circle-outline"></ion-icon></a>
+                            </div>
+                        </div> 
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend" style="width: 50%">
+                                <span class="input-group-text" style="width: 100%">Inteligencja</span>
+                            </div>
+                            <input type="text" class="form-control" placeholder="@Model.Intelligence" disabled>
+                            <div class="input-group-append">
+                                <a asp-controller="Game" asp-action="UpgradeSkills" asp-route-id="Intelligence" class="btn btn-outline-secondary"><ion-icon name="add-circle-outline"></ion-icon></a>
+                            </div>
+                        </div> 
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

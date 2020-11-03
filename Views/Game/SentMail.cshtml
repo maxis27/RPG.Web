@@ -1,0 +1,40 @@
+@model IEnumerable<Mail>
+@inject UserManager<ApplicationUser> userManager
+
+@{
+    ViewBag.Title = "Wiadomości wysłane";
+}
+
+<div class="card">
+    <div class="card-header">@ViewBag.Title</div>
+    <div class="card-body">
+        <div class="btn-group d-flex mb-3">
+            <a asp-action="NewMail" class="btn btn-secondary">Nowa wiadomość</a>
+            <a asp-action="Mail" class="btn btn-secondary">Wiadomości odebrane</a>
+            <a asp-action="SentMail" class="btn btn-secondary">Wiadomości wysłane</a>
+        </div>
+        @if(Model.Any())
+        {
+            @foreach(var mail in Model)
+            {
+                var userName = await userManager.FindByIdAsync(mail.ToId);
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <div class="float-right">@mail.Date</div>
+                        Do: @userName <br> Tytuł: @mail.Title
+                    </div>
+                    <div class="card-body">
+                        @Html.Raw(mail.Content)
+                    </div>
+                    <div class="card-footer">
+                        <a asp-action="DeleteSentMail" asp-route-id="@mail.Id" class="btn btn-danger">Usuń</a>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <h5 class="card-title">Brak wysłanych wiadomości.</h5>
+        }
+    </div>
+</div>

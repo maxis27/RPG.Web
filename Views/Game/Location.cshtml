@@ -1,0 +1,58 @@
+@model Location
+@inject UserManager<ApplicationUser> userManager;
+
+@{
+    ViewBag.Title = "Lokacja";
+
+    var user = await userManager.GetUserAsync(User);
+    var locationType = string.Empty;
+    switch(Model.Type)
+    {
+        case LocationType.Village:
+            locationType = "Wioska";
+            break;
+        case LocationType.City:
+            locationType = "Miasteczko";
+            break;
+        case LocationType.Polis:
+            locationType = "Metropolia";
+            break;
+    }
+}
+
+<div class="card">
+    <div class="card-header">@ViewBag.Title</div>
+    <div class="card-body">
+        <div class="row">
+            <div class="card col-sm-5 col-md-4 col-lg-5 m-1">
+                <img class="card-img-top p-2" src="~/images/no-avatar.png">
+            </div>
+            <div class="card col-sm col-md col-lg m-1">
+                <div class="card-body">
+                    <legend>@locationType @Model.Name</legend>
+                    <table class="table table-striped table-hover">
+                        <tr>
+                            <td>Położenie geograficzne:</td>
+                            <td><div class="float-right">X:@Model.X, Y:@Model.Y</div></td>
+                        </tr>
+                        <tr>
+                            <td>Minimalne wynagrodzenie:</td>
+                            <td><div class="float-right">@Model.Gold zł</div></td>
+                        </tr>
+                        <tr>
+                            <td>Minimalna stopa doświadczenia:</td>
+                            <td><div class="float-right">@Model.Experience pkt.</div></td>
+                        </tr>
+                    </table>
+                </div>
+                @if(user.Status == UserStatus.Stays)
+                {
+                    <div class="card-footer">
+                        <a asp-action="Trip" asp-route-id="@Model.Id" class="btn btn-primary">Idź do lokacji</a>
+                    </div>
+                }    
+            </div>
+        </div>
+        <a asp-action="Map" class="btn btn-primary">Powrót do mapy</a>
+    </div>
+</div>

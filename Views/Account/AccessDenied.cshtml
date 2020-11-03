@@ -1,0 +1,12 @@
+@{
+    ViewBag.Title = "Brak dostępu";
+}
+
+<div class="card">
+    <div class="card-header">@ViewBag.Title</div>
+    <div class="card-body">
+        <h5 class="card-title">Nie masz uprawnień do przeglądania tego zasobu.</h5>
+        <p><ion-icon name="key-outline" style="font-size:128px;"></ion-icon></p>
+        <a asp-controller="Home" asp-action="Index" class="btn btn-info">Powrót do strony głównej</a>
+    </div>
+</div>

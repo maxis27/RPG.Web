@@ -1,0 +1,50 @@
+@model IEnumerable<Inventory>
+
+@{
+    ViewBag.Title = "Kowal";
+}
+
+<div class="card">
+    <div class="card-header">@ViewBag.Title</div>
+    <div class="card-body">
+        <div class="card">
+            <div class="card-body">
+                <div class="form-group row">
+                    <label class="col-sm-2 col-form-label">Koszt</label>
+                    <div class="col-sm-10">
+                        <input class="form-control" disabled placeholder="1% - 1 złota">
+                    </div>
+                </div>
+            </div>
+        </div>
+        @if(Model.Where(x => x.Used == false).Any())
+        {
+            <div class="card mt-3">
+                <div class="card-body">
+                    <div class="text-center">EKWIPUNEK</div>
+                    <div class="row">
+                    @foreach (var inventory in Model.Where(x => x.Used == false))
+                    {
+                        <a asp-action="Blacksmith" asp-route-id="@inventory.Id" class="col-2 text-center">
+                            <img class="mb-1" src="~/images/items/@(inventory.ItemId).png">
+                            <div class="progress mb-1">
+                                <div class="progress-bar bg-info" role="progressbar" style="width: @inventory.Stamina%;">
+                                    <span>@inventory.Stamina%</span>
+                                </div>
+                            </div>
+                            @if(inventory.Stamina < 100)
+                            {
+                                <input class="form-control form-control-sm text-center" type="text" disabled value="@(100 - inventory.Stamina) zł">
+                            }
+                            else
+                            {
+                                <input class="form-control form-control-sm text-center" type="text" disabled value="SPRAWNY">
+                            }
+                        </a>
+                    }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

@@ -1,0 +1,11 @@
+@{
+    ViewBag.Title = "Błąd przetwarzania";
+}
+
+<div class="card">
+    <div class="card-header">@ViewBag.Title</div>
+    <div class="card-body">
+        <h5 class="card-title">Wystąpił błąd podczas przetwarzania żądania.</h5>
+        <a asp-controller="Home" asp-action="Index" class="btn btn-info">Powrót do strony głównej</a>
+    </div>
+</div>

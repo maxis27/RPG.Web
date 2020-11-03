@@ -1,0 +1,18 @@
+@model int
+
+@{
+    ViewBag.Title = "Lista zmian";
+}
+
+<div class="card">
+    <div class="card-header">@ViewBag.Title</div>
+    <div class="card-body">
+        <div class="card border-danger">
+            <div class="card-header">Nie znaleziono</div>
+            <div class="card-body">Nie można znaleźć wersji o Id: '@Model'.</div>
+            <div class="card-footer">
+                <a asp-action="Index" class="btn btn-info">Powrót do listy</a>
+            </div>
+        </div>
+    </div>
+</div>

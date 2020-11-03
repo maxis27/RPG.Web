@@ -1,0 +1,133 @@
+@model IEnumerable<Inventory>
+@inject IItemRepository itemRepository
+
+@{
+    ViewBag.Title = "Ekwipunek";
+
+    Inventory weapon = null, armor = null;
+    foreach (var inventory in Model.Where(x => x.Used == true).ToList())
+    {
+        var item = itemRepository.GetItem(inventory.ItemId);
+        if(item.Type == ItemType.Weapon)
+        {
+            weapon = inventory;
+        }
+        else if(item.Type == ItemType.Armor)
+        {
+            armor = inventory;
+        }
+    }
+}
+
+<div class="card">
+    <div class="card-header">@ViewBag.Title</div>
+    <div class="card-body">
+        <div class="row">
+            <div class="card col-3 m-1 text-center">
+                <div class="card-body">
+                    <div>Broń podstawowa</div>
+                @if(weapon == null)
+                {
+                     <img class="mb-1" src="~/images/none.png">
+                }
+                else
+                {
+                    <a asp-action="Inventory" asp-route-id="@weapon.Id">
+                        <img class="mb-1" src="~/images/items/@(weapon.ItemId).png">
+                        <div class="progress mb-1">
+                            <div class="progress-bar bg-info" role="progressbar" style="width: @weapon.Stamina%;">
+                                <span>@weapon.Stamina%</span>
+                            </div>
+                        </div>
+                    </a>
+                }
+                </div>        
+            </div>
+            <div class="card col m-1">
+                <div class="card-body">
+                    @if(weapon == null)
+                    {
+                        <div class="text-center">
+                            <img class="mb-1" src="~/images/none.png">
+                        </div>
+                    }
+                    else
+                    {
+                        var item = (ItemWeapon)itemRepository.GetItem(weapon.ItemId).ItemType;
+                    	<div class="form-group">
+                            <label class="control-label" for="inputSmall">Obrażenia</label>
+                            <input class="form-control form-control-sm" type="text" disabled value="@item.MinDamage/@item.MaxDamage">
+                            <label class="control-label" for="inputSmall">Wytrzymałość</label>
+                            <input class="form-control form-control-sm" type="text" disabled value="@weapon.Stamina%">
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="card col-3 m-1 text-center">
+                <div class="card-body">
+                    <div>Zbroja</div>
+                @if(armor == null)
+                {
+                    <img class="mb-1" src="~/images/none.png">
+                }
+                else
+                {
+                    <a asp-action="Inventory" asp-route-id="@armor.Id">
+                        <img class="mb-1" src="~/images/items/@(armor.ItemId).png">
+                        <div class="progress mb-1">
+                            <div class="progress-bar bg-info" role="progressbar" style="width: @armor.Stamina%;">
+                                <span>@armor.Stamina%</span>
+                            </div>
+                        </div>
+                    </a>
+                }
+                </div>        
+            </div>
+            <div class="card col m-1">
+                <div class="card-body">
+                    @if(armor == null)
+                    {
+                        <div class="text-center">
+                            <img class="mb-1" src="~/images/none.png">
+                        </div>
+                    }
+                    else
+                    {
+                        var item = (ItemArmor)itemRepository.GetItem(armor.ItemId).ItemType;
+                    	<div class="form-group">
+                            <label class="control-label" for="inputSmall">Odporność</label>
+                            <input class="form-control form-control-sm" type="text" disabled value="@item.Resist%">
+                            <label class="control-label" for="inputSmall">Wytrzymałość</label>
+                            <input class="form-control form-control-sm" type="text" disabled value="@armor.Stamina%">
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        @if(Model.Where(x => x.Used == false).Any())
+        {
+            <div class="card mt-3">
+                <div class="card-body">
+                    <div class="text-center">EKWIPUNEK</div>
+                    <div class="row">
+                    @foreach (var inventory in Model.Where(x => x.Used == false))
+                    {
+                        <a asp-action="Inventory" asp-route-id="@inventory.Id" class="col-2 text-center">
+                            <img class="mb-1" src="~/images/items/@(inventory.ItemId).png">
+                            <div class="progress mb-1">
+                                <div class="progress-bar bg-info" role="progressbar" style="width: @inventory.Stamina%;">
+                                    <span>@inventory.Stamina%</span>
+                                </div>
+                            </div>
+                        </a>
+                    }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

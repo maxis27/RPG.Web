@@ -1,0 +1,49 @@
+@model IEnumerable<Mail>
+@inject UserManager<ApplicationUser> userManager
+
+@{
+    ViewBag.Title = "Wiadomości odebrane";
+}
+
+<div class="card">
+    <div class="card-header">@ViewBag.Title</div>
+    <div class="card-body">
+        <div class="btn-group d-flex mb-3">
+            <a asp-action="NewMail" class="btn btn-secondary">Nowa wiadomość</a>
+            <a asp-action="Mail" class="btn btn-secondary">Wiadomości odebrane</a>
+            <a asp-action="SentMail" class="btn btn-secondary">Wiadomości wysłane</a>
+        </div>
+        @if(Model.Any())
+        {
+            @foreach(var mail in Model)
+            {
+                object userName;
+                if(mail.FromId.Contains("system"))  
+                    userName = Html.Raw("<i>[SYSTEM]</i>"); 
+                else 
+                    userName = await userManager.FindByIdAsync(mail.FromId);
+                    
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <div class="float-right">@mail.Date</div>
+                        Od: @userName <br> Tytuł: @mail.Title
+                    </div>
+                    <div class="card-body">
+                        @Html.Raw(mail.Content)
+                    </div>
+                    <div class="card-footer">
+                        @if(!mail.FromId.Contains("system"))
+                        {
+                            <a asp-action="NewMail" asp-route-id="@mail.FromId" class="btn btn-primary">Odpisz</a>
+                        } 
+                        <a asp-action="DeleteMail" asp-route-id="@mail.Id" class="btn btn-danger">Usuń</a>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <h5 class="card-title">Brak odebranych wiadomości.</h5>
+        }
+    </div>
+</div>

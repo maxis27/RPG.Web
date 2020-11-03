@@ -1,0 +1,51 @@
+@model TavernViewModel
+
+@{
+    ViewBag.Title = "Karczma";
+}
+
+<div class="card">
+    <div class="card-header">@ViewBag.Title</div>
+    <div class="card-body">
+        @if(Model.TavernProgress)
+        {
+            var progress = Math.Floor((DateTime.UtcNow - Model.Tavern.Start) / (Model.Tavern.End - Model.Tavern.Start) * 100);
+            var remains = Math.Floor((Model.Tavern.End - DateTime.UtcNow).TotalSeconds);
+            var now = DateTime.UtcNow.Ticks / @TimeSpan.TicksPerSecond;
+            var start = Model.Tavern.Start.Ticks / TimeSpan.TicksPerSecond;
+            var end = Model.Tavern.End.Ticks / TimeSpan.TicksPerSecond;
+
+            <form asp-controller="Game" asp-action="StopTavern" method="post">
+               <div class="progress mb-3" style="height: 30px;">
+                    <div id="progressbar" class="progress-bar progress-bar-striped progress-bar-animated bg-info" role="progressbar" style="width: @progress%;">
+                        <span id="clock">@remains.ToString(@"hh\:mm\:ss")</span>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Wyjdź z karczmy</button>
+            </form>
+
+            @section Scripts
+            {
+                <script>
+                    countTime(@remains, "/Game/Tavern");
+                    progress(@now, @start, @end);
+                </script>
+            }
+        }
+        else
+        {
+            <form method="post">
+                <div asp-validation-summary="All" class="text-danger"></div>
+                <div class="form-group">
+                    <label>Koszt</label>
+                    <input placeholder="10 złota / godzinę - 2 pkt. akcji" class="form-control" disabled/>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Tavern.Hours"></label>
+                    @Html.DropDownListFor(m => m.Tavern.Hours, Enumerable.Range(1, (int)Math.Floor(Model.TimeToMaxPoints)).Select(i => new SelectListItem { Text = i.ToString() + " godz.",  Value = i.ToString() }), $"Pełny odpoczynek - {Model.TimeToMaxPoints} godz.", new { @class = "form-control" })
+                </div>
+                <button type="submit" class="btn btn-primary">Odpocznij</button>
+            </form>
+        }
+    </div>
+</div>

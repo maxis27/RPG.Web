@@ -1,0 +1,98 @@
+@model RankViewModel
+@inject ILocationRepository locationRepository
+@inject UserManager<ApplicationUser> userManager
+
+@{
+    ViewBag.Title = "Gracze w okolicy";
+
+    List<string> sort = new List<string>
+    {
+        "UserName", "Level", "AllExperience", "Strength", "Dexterity", "Stamina", "Intelligence"
+    };
+
+    var icon = new Dictionary<string, IHtmlContent>();
+    var order = new Dictionary<string, string>();
+
+    foreach(var name in sort)
+    {
+        icon[name] = null;
+        order[name] = name == "UserName" ? "ASC" : "DESC";
+    }
+
+    if(Model.OrderBy == "DESC")
+    {
+        order[Model.SortBy] = "ASC";
+        icon[Model.SortBy] = Html.Raw("<ion-icon name=\"caret-down-outline\"></ion-icon>");
+    }
+    else
+    {
+        order[Model.SortBy] = "DESC";
+        icon[Model.SortBy] = Html.Raw("<ion-icon name=\"caret-up-outline\"></ion-icon>");
+    }
+
+    var thisUser = await userManager.GetUserAsync(User);
+    var location = locationRepository.GetLocations()
+                                    .Where(loc => loc.X == thisUser.PositionX)
+                                    .Where(loc => loc.Y == thisUser.PositionY)
+                                    .SingleOrDefault();
+    var locationType = string.Empty;
+    switch(location.Type)
+    {
+        case LocationType.Village:
+            locationType = "Wioska";
+            break;
+        case LocationType.City:
+            locationType = "Miasteczko";
+            break;
+        case LocationType.Polis:
+            locationType = "Metropolia";
+            break;
+    }
+}
+
+<div class="card">
+    <div class="card-header">@ViewBag.Title</div>
+    <div class="card-body">
+        <div class="card">
+            <div class="card-header">
+                @locationType @location.Name
+            </div>
+            <div class="card-body">
+                <div class="table-responsive text-nowrap">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th><a asp-route-sortBy="UserName" asp-route-orderBy="@order["UserName"]">Nazwa @icon["UserName"]</a></th>
+                                <th><a asp-route-sortBy="Level" asp-route-orderBy="@order["Level"]">Poziom @icon["Level"]</a></th>
+                                <th><a asp-route-sortBy="AllExperience" asp-route-orderBy="@order["AllExperience"]">Doświadczenie @icon["AllExperience"]</a></th>
+                                <th><a asp-route-sortBy="Strength" asp-route-orderBy="@order["Strength"]">SI @icon["Strength"]</a></th>
+                                <th><a asp-route-sortBy="Dexterity" asp-route-orderBy="@order["Dexterity"]">ZR @icon["Dexterity"]</a></th>
+                                <th><a asp-route-sortBy="Stamina" asp-route-orderBy="@order["Stamina"]">WY @icon["Stamina"]</a></th>
+                                <th><a asp-route-sortBy="Intelligence" asp-route-orderBy="@order["Intelligence"]">IN @icon["Intelligence"]</a></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                int i = 0;
+                                foreach (var user in Model.Users)
+                                {
+                                    <tr>
+                                        <td>@(++i)</td>
+                                        <td><a asp-action="Stats" asp-route-id="@user.Id">@user.UserName</a></td>
+                                        <td>@user.Level</td>
+                                        <td>@user.AllExperience</td>
+                                        <td>@user.Strength</td>
+                                        <td>@user.Dexterity</td>
+                                        <td>@user.Stamina</td>
+                                        <td>@user.Intelligence</td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

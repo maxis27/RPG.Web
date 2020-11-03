@@ -1,0 +1,119 @@
+@inject SignInManager<ApplicationUser> signInManager
+
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="~/lib/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="~/css/site.css" rel="stylesheet">
+    <title>@ViewBag.Title - RPG.Web</title>
+</head>
+<body>
+    <div class="container">
+        <nav class="navbar navbar-expand-md bg-light navbar-light">
+            <a asp-controller="Home" asp-action="Index" class="navbar-brand">
+                RPG.Web
+            </a>
+            <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#collapsibleNavbar">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="collapsibleNavbar">
+                <ul class="navbar-nav">
+                    @if(signInManager.IsSignedIn(User))
+                    {
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#">Postać</a>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item" asp-controller="Game" asp-action="Stats">Statystyki</a>
+                                <a class="dropdown-item" asp-controller="Game" asp-action="Inventory">Ekwipunek</a>
+                                <a class="dropdown-item" asp-controller="Game" asp-action="Mail">Poczta</a>
+                            </div>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#">Miasto</a>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item" asp-controller="Game" asp-action="Area">Okolica</a>
+                                <a class="dropdown-item" asp-controller="Game" asp-action="Work">Praca</a>
+                                <a class="dropdown-item" asp-controller="Game" asp-action="Arena">Arena</a>
+                                <a class="dropdown-item" asp-controller="Game" asp-action="Shop">Sklep</a>
+                                <a class="dropdown-item" asp-controller="Game" asp-action="Medic">Medyk</a>
+                                <a class="dropdown-item" asp-controller="Game" asp-action="Blacksmith">Kowal</a>
+                                <a class="dropdown-item" asp-controller="Game" asp-action="Tavern">Karczma</a>
+                            </div>
+                        </li>
+                        <li class="nav-item">
+                            <a asp-controller="Game" asp-action="Map" class="nav-link">Mapa</a>
+                        </li>
+                        <li class="nav-item">
+                            <a asp-controller="Game" asp-action="Rank" class="nav-link">Ranking</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#">Ustawienia</a>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item" asp-controller="Account" asp-action="ChangePassword">Zmiana hasła</a>
+                                <a class="dropdown-item" asp-controller="Account" asp-action="ChangeAvatar">Zmiana avatara</a>
+                            </div>
+                        </li>
+                        @if(User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#">Administracja</a>
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item" asp-controller="Administration" asp-action="ListRoles">Zarządzanie rolami</a>
+                                </div>
+                            </li>
+                        }
+                        <li class="nav-item">
+                            <a asp-controller="Account" asp-action="Logout" class="nav-link">Wyloguj</a>
+                        </li>
+                    } 
+                    else 
+                    {
+                        <li class="nav-item">
+                            <a asp-controller="Account" asp-action="Register" class="nav-link">Rejestracja</a>
+                        </li>
+                        <li class="nav-item">
+                            <a asp-controller="Account" asp-action="Login" class="nav-link">Logowanie</a>
+                        </li>
+                    }
+                </ul>
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a asp-controller="Changelog" asp-action="Index" class="nav-link">Lista zmian</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    
+        <main>
+            @if(signInManager.IsSignedIn(User))
+            {
+                <div class="row">
+                    <div class="col mb-3">
+                        @await Component.InvokeAsync("Statusbar")
+                    </div>
+                </div>
+            }
+            <div class="row">
+                <div class="col-lg-7 col-xl-8 mb-3">
+                    @RenderBody()
+                </div>
+                @if(signInManager.IsSignedIn(User))
+                {
+                    <div class="col-lg-5 col-xl-4 mb-3">
+                        @await Component.InvokeAsync("Sidebar")
+                    </div>
+                }
+            </div>
+        </main>
+    </div>
+    <script src="~/lib/jquery/jquery.js"></script>
+    <script src="~/lib/jquery-validate/jquery.validate.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+    <script src="~/lib/bootstrap/js/bootstrap.js"></script>
+    <script src="~/lib/ionicons/ionicons.js"></script>
+    <script src="~/js/site.js"></script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

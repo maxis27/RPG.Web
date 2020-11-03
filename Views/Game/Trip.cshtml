@@ -1,0 +1,54 @@
+@model Trip
+@inject UserManager<ApplicationUser> userManager
+@inject ILocationRepository locationRepository
+
+@{
+    ViewBag.Title = "Wyprawa";
+
+    var progress = Math.Floor((DateTime.UtcNow - Model.Start) / (Model.End - Model.Start) * 100);
+    var remains = Math.Floor((Model.End - DateTime.UtcNow).TotalSeconds);
+    var now = DateTime.UtcNow.Ticks / TimeSpan.TicksPerSecond;
+    var start = Model.Start.Ticks / TimeSpan.TicksPerSecond;
+    var end = Model.End.Ticks / TimeSpan.TicksPerSecond;
+
+    var user = await userManager.GetUserAsync(User);
+    var locationFrom = locationRepository.GetLocations()
+                                    .Where(loc => loc.X == user.PositionX)
+                                    .Where(loc => loc.Y == user.PositionY)
+                                    .SingleOrDefault();
+    var locationTo = locationRepository.GetLocations()
+                                    .Where(loc => loc.X == Model.X)
+                                    .Where(loc => loc.Y == Model.Y)
+                                    .SingleOrDefault();
+}
+
+<div class="card">
+    <div class="card-header">@ViewBag.Title</div>
+    <div class="card-body">
+        <div class="form-group">
+            <div class="input-group">
+                <input value="@locationFrom.Name" class="form-control" disabled/>
+                <div class="input-group-prepend input-group-append">
+                    <span class="input-group-text">-></span>
+                </div>
+                <input value="@locationTo.Name" class="form-control" disabled/>
+            </div>
+        </div>
+        <form asp-controller="Game" asp-action="StopTrip" method="post">
+            <div class="progress mb-3" style="height: 30px;">
+                <div id="progressbar" class="progress-bar progress-bar-striped progress-bar-animated bg-info" role="progressbar" style="width: @progress%;">
+                    <span id="clock">@remains.ToString(@"hh\:mm\:ss")</span>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Anuluj wyprawę</button>
+        </form>
+
+        @section Scripts
+        {
+            <script>
+                countTime(@remains, "/Game/Map");
+                progress(@now, @start, @end);
+            </script>
+        }
+    </div>
+</div>

@@ -1,0 +1,29 @@
+@model IEnumerable<Changes>
+
+@{
+    ViewBag.Title = "Strona główna";
+}
+
+<div class="card">
+    <div class="card-header">@ViewBag.Title</div>
+    <div class="card-body">
+        <h5 class="card-title">Witaj w RPG.Web!</h5>
+
+        @foreach (var changes in Model)
+        {
+            var divClass = changes == Model.First() ? "card border-primary mt-3 mb-3" : "card mb-3";
+            var headerClass = changes == Model.First() ? "card-header bg-primary text-white" : "card-header";
+            var aClass = changes == Model.First() ? "text-white" : "";
+
+            <div class="@divClass">
+                <div class="@headerClass">
+                    <a asp-controller="Changelog" asp-action="Details" asp-route-id="@changes.Id" class="@aClass">Wersja: @changes.Version</a>
+                    <div class="float-right">@changes.Date</div>
+                </div>
+                <div class="card-body">
+                    @Html.Raw(changes.Content)
+                </div>
+            </div>
+        }
+    </div>
+</div>

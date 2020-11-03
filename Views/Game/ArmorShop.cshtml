@@ -1,0 +1,74 @@
+@model ShopViewModel
+@inject IItemRepository itemRepository
+
+@{
+    ViewBag.Title = "Sklep";
+}
+
+<div class="card">
+    <div class="card-header">@ViewBag.Title</div>
+    <div class="card-body">
+        <div class="btn-group d-flex mb-3">
+            <a asp-action="WeaponShop" class="btn btn-secondary">Bronie</a>
+            <a asp-action="ArmorShop" class="btn btn-secondary">Zbroje</a>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive text-nowrap">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th></th>
+                                <th>Nazwa</th>
+                                <th>Cena</th>
+                                <th>Odporność</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                int i = 0;
+                                foreach (var item in Model.Items)
+                                {
+                                    var armor = (ItemArmor)item.ItemType;
+                                    <tr>
+                                        <td>@(++i)</td>
+                                        <td><img src="~/images/items/@(item.Id).png"></td>
+                                        <td>@item.Name</td>
+                                        <td>@item.Cost zł</td>
+                                        <td>@armor.Resist%</td>
+                                        <td><a asp-action="ShopBuy" asp-route-id="@item.Id" class="btn btn-primary">Kup</a></td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        @if(Model.Inventory.Any())
+        {
+            <div class="card mt-3">
+                <div class="card-body">
+                    <div class="text-center">EKWIPUNEK</div>
+                    <div class="row">
+                    @foreach (var inventory in Model.Inventory)
+                    {
+                        var item = itemRepository.GetItem(inventory.ItemId);
+                        <a asp-action="ShopSell" asp-route-id="@inventory.Id" class="col-2 text-center">
+                            <img class="mb-1" src="~/images/items/@(inventory.ItemId).png">
+                            <div class="progress mb-1">
+                                <div class="progress-bar bg-info" role="progressbar" style="width: @inventory.Stamina%;">
+                                    <span>@inventory.Stamina%</span>
+                                </div>
+                            </div>
+                            <input class="form-control form-control-sm text-center" type="text" disabled value="@item.Cost zł">
+                        </a>
+                    }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
